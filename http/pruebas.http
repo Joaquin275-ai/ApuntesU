@@ -1,0 +1,128 @@
+### ============================================
+### ApuntesU — Pruebas
+### Reemplaza estas dos variables con los datos de TU proyecto de Supabase
+### (Project Settings > API).
+### ============================================
+
+@supabase_url = https://mlacfhjxzjrwcyxyvpym.supabase.co
+@supabase_publishable_key = sb_secret_08si9Jc_ejf9d8Fjff3z_A_9XArqxhr
+
+
+### ============================================
+### PASO 0 — Login: obtener el access_token de tus 2 usuarios de prueba
+### Corre esto una vez por usuario y pega cada access_token abajo.
+### Los tokens duran ~1h — si empiezan a fallar con 401 sin razón,
+### vuelve a correr el login del usuario correspondiente.
+### ============================================
+
+POST {{supabase_url}}/auth/v1/token?grant_type=password
+apikey: {{supabase_publishable_key}}
+Content-Type: application/json
+
+{
+    "email": "alumno@apuntesu.dev",
+    "password": "Demo1234!"
+}
+
+###
+
+POST {{supabase_url}}/auth/v1/token?grant_type=password
+apikey: {{supabase_publishable_key}}
+Content-Type: application/json
+
+{
+    "email": "monitor@apuntesu.dev",
+    "password": "Demo1234!"
+}
+
+
+### ⚠️ Si dejas estos dos valores tal cual, TODO lo de abajo va a fallar
+### con 401 "Expected 3 parts in JWT; got 1". Corre el paso 0 primero.
+
+@token_alumno = eyJhbGciOiJFUzI1NiIsImtpZCI6IjgxNGVhZTkxLWFlZGUtNGVkNS05MTQ4LWUxOTQyZjVhZjgxYyIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL21sYWNmaGp4empyd2N5eHl2cHltLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJhYmU2M2M3MS1iMGZmLTQxOTgtOWIzMC1jYmE5NGRmYWNlMDEiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzkwNzEyODA2LCJpYXQiOjE3OTA3MDkyMDYsImVtYWlsIjoiYWx1bW5vQGFwdW50ZXN1LmRldiIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWV9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzkwNzA5MjA2fV0sInNlc3Npb25faWQiOiJiZGM1MjY3ZC1lNWY2LTRhNmMtOWFhMS01OGI0MjQ3ZDJhNDEiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.Dl-Pu8KR4ORD8NiR3K3_odAtdYcuWzXDhN9TlqNhKbvJQBFBxUD9P-gMLFF6SzT69BEt67iaQe1ckSzR7uhgNA
+@token_monitor = eyJhbGciOiJFUzI1NiIsImtpZCI6IjgxNGVhZTkxLWFlZGUtNGVkNS05MTQ4LWUxOTQyZjVhZjgxYyIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL21sYWNmaGp4empyd2N5eHl2cHltLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJhYWVlOGE4NS0wMmMyLTQ2Y2ItYjRjYy02MDYyZDU0YzZjNjciLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzkwNzEyODQxLCJpYXQiOjE3OTA3MDkyNDEsImVtYWlsIjoibW9uaXRvckBhcHVudGVzdS5kZXYiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc5MDcwOTI0MX1dLCJzZXNzaW9uX2lkIjoiNzYyOWZhMWMtOWE0OS00Zjk4LTg1OTItM2Y2MzMwNjcxNWIxIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.SwIb86CjaxVFtRdBd5Lul6q7Z03aQkKW9i3Cd7BBeK3OGdVnGoIv-C20H4QfL0twhXXPGEb3Wj73hnwiDw7IGg
+
+
+### ============================================
+### TICKET 1 — Confirmar el candado, después ver solo lo tuyo
+### ============================================
+
+### 1a. Antes de escribir NINGUNA política (solo activaste RLS):
+### esto debe devolver [] vacío, aunque la tabla sí tenga 2 filas.
+GET {{supabase_url}}/rest/v1/apuntes
+apikey: {{supabase_publishable_key}}
+Authorization: Bearer {{token_alumno}}
+
+###
+
+### 1b. Después de tu política de SELECT: debe devolver tus 2 apuntes.
+GET {{supabase_url}}/rest/v1/apuntes
+apikey: {{supabase_publishable_key}}
+Authorization: Bearer {{token_alumno}}
+
+
+### ============================================
+### TICKET 2 — Probar el INSERT
+### ============================================
+
+### 2a. Insert válido — autor_id es tu propio UUID. Debe pasar (201).
+### Reemplaza UUID_DE_ALUMNO por el UUID real.
+POST {{supabase_url}}/rest/v1/apuntes
+apikey: {{supabase_publishable_key}}
+Authorization: Bearer {{token_alumno}}
+Content-Type: application/json
+Prefer: return=representation
+
+{
+    "autor_id": "abe63c71-b0ff-4198-9b30-cba94dface01",
+    "materia_id": "22222222-2222-2222-2222-222222222222",
+    "contenido": "Un apunte nuevo, insertado a mi propio nombre."
+}
+
+###
+
+### 2b. Insert inválido — a propósito ponemos el UUID del monitor.
+### Con tu política de WITH CHECK activa, esto debe FALLAR (403).
+POST {{supabase_url}}/rest/v1/apuntes
+apikey: {{supabase_publishable_key}}
+Authorization: Bearer {{token_alumno}}
+Content-Type: application/json
+Prefer: return=representation
+
+{
+    "autor_id": "aaee8a85-02c2-46cb-b4cc-6062d54c6c67",
+    "materia_id": "22222222-2222-2222-2222-222222222222",
+    "contenido": "Intento de insertar a nombre de otro usuario."
+}
+
+
+### ============================================
+### TICKET 3 — Probar el UPDATE
+### ============================================
+
+### 3a. Editas tu propia fila — debe pasar.
+### Reemplaza EL_ID_DE_TU_APUNTE por el id de uno de tus apuntes
+### (lo copias de la respuesta del Ticket 1b).
+PATCH {{supabase_url}}/rest/v1/apuntes?id=eq.6793c589-7c35-4b70-8ff4-b5f373838744
+apikey: {{supabase_publishable_key}}
+Authorization: Bearer {{token_alumno}}
+Content-Type: application/json
+Prefer: return=representation
+
+{
+    "contenido": "Apunte editado por su propio autor."
+}
+
+
+### ============================================
+### BONUS — El monitor ve toda la materia
+### ============================================
+
+GET {{supabase_url}}/rest/v1/apuntes
+apikey: {{supabase_publishable_key}}
+Authorization: Bearer {{token_monitor}}
+
+### Debe traer TODOS los apuntes de la materia, no solo los del monitor.
+GET {{supabase_url}}/rest/v1/apuntes?id=eq.6793c589-7c35-4b70-8ff4-b5f373838744
+apikey: {{supabase_publishable_key}}
+Authorization: Bearer {{token_alumno}}
